@@ -8,7 +8,7 @@ const { registerUser, loginUser } = require("../controllers/usuarioController");
 // VER USUARIOS
 // ====================
 
-router.get("/", (req, res) => {
+router.get("/usuarios", (req, res) => {
 
   db.query("SELECT id, nombre FROM usuarios", (err, result) => {
 
