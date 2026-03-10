@@ -1,7 +1,7 @@
 const mysql = require("mysql2");
 const { URL } = require("url");
 
-// Solo require dotenv si estamos en local
+// Cargar dotenv solo en local
 if (process.env.NODE_ENV !== "production") {
   require("dotenv").config();
 }
@@ -9,7 +9,7 @@ if (process.env.NODE_ENV !== "production") {
 const databaseUrl = process.env.DATABASE_URL;
 
 if (!databaseUrl) {
-  console.error("❌ No se encontró la variable DATABASE_URL");
+  console.error("❌ DATABASE_URL no definida");
   throw new Error("DATABASE_URL no definida");
 }
 
@@ -21,7 +21,7 @@ const pool = mysql.createPool({
   password: dbUrl.password,
   database: dbUrl.pathname.replace("/", ""),
   port: dbUrl.port || 3306,
-  ssl: { rejectUnauthorized: true }, // obligatorio para PlanetScale
+  ssl: { rejectUnauthorized: true }, // obligatorio PlanetScale
   waitForConnections: true,
   connectionLimit: 10,
   queueLimit: 0
