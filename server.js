@@ -9,35 +9,33 @@ const usuarioRoutes = require("./routes/usuarioRoutes");
 const app = express();
 
 // =======================
-// CORS dinámico: permite local o Netlify
+// CORS dinámico: localhost + Netlify
 // =======================
 const allowedOrigins = [
-  "http://localhost:3000", // frontend local
-  "https://battery-solar.netlify.app" // frontend Netlify
+  "http://localhost:3000",                  // frontend local
+  "https://battery-solar.netlify.app"       // frontend Netlify
 ];
 
 const corsOptions = {
-  origin: function (origin, callback) {
-    // Permite requests sin origin (Postman, curl) o si está en allowedOrigins
+  origin: function(origin, callback) {
+    // Permite requests sin origin (ej: Postman) o si está en allowedOrigins
     if (!origin || allowedOrigins.includes(origin)) {
       callback(null, true);
     } else {
       callback(new Error("No permitido por CORS"));
     }
   },
-  methods: ["GET","POST","PUT","DELETE","OPTIONS"],
+  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
   credentials: true
 };
 
-// =======================
-// OPTIONS preflight
-// =======================
+// Middleware CORS
+app.use(cors(corsOptions));
+
+// Soporta preflight OPTIONS en todas las rutas
 app.options("*", cors(corsOptions));
 
-// =======================
-// Middlewares
-// =======================
-app.use(cors(corsOptions));
+// Middleware JSON
 app.use(express.json());
 
 // =======================
@@ -76,10 +74,10 @@ app.get("/datos", async (req, res, next) => {
 });
 
 // =======================
-// Middleware global de errores (incluye CORS)
+// Middleware global de errores
 // =======================
 app.use((err, req, res, next) => {
-  // Cabeceras CORS siempre
+  // Asegura que siempre se envíen cabeceras CORS
   res.header("Access-Control-Allow-Origin", req.headers.origin || "*");
   res.header(
     "Access-Control-Allow-Headers",
@@ -89,10 +87,8 @@ app.use((err, req, res, next) => {
   res.status(err.status || 500).json({ error: err.message });
 });
 
-// =======================
 // Puerto
-// =======================
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
-  console.log(`Servidor corriendo en puerto ${PORT}`);
+  console.log("Servidor corriendo en puerto " + PORT);
 });
