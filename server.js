@@ -44,7 +44,7 @@ app.get("/usuarios", (req, res) => {
 // VER BATERIAS
 // =======================
 
-app.get("/baterias", (req, res) => {
+app.get("/datos", (req, res) => {
 
   db.query("SELECT * FROM monitoreo_baterias", (err, result) => {
 
