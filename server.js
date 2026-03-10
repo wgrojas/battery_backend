@@ -13,7 +13,7 @@ const app = express();
 // CORS dinámico: permite local o Netlify
 // =======================
 const allowedOrigins = [
-  "http://localhost:5173", // Cambia el puerto si tu frontend local es distinto
+  "http://localhost:3000", // Cambia el puerto si tu frontend local es distinto
   "https://battery-solar.netlify.app" // Frontend en Netlify
 ];
 
