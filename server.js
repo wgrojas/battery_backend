@@ -22,31 +22,31 @@ app.get("/", (req, res) => {
   res.send("🔋 API Monitor Bateria Solar funcionando");
 });
 
-// =======================
-// VER USUARIOS
-// =======================
-app.get("/usuarios", async (req, res) => {
-  try {
-    const [result] = await db.query("SELECT * FROM usuarios");
-    res.json(result);
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: err.message });
-  }
-});
+// // =======================
+// // VER USUARIOS
+// // =======================
+// app.get("/usuarios", async (req, res) => {
+//   try {
+//     const [result] = await db.query("SELECT * FROM usuarios");
+//     res.json(result);
+//   } catch (err) {
+//     console.error(err);
+//     res.status(500).json({ error: err.message });
+//   }
+// });
 
-// =======================
-// VER BATERIAS
-// =======================
-app.get("/datos", async (req, res) => {
-  try {
-    const [result] = await db.query("SELECT * FROM monitoreo_baterias");
-    res.json(result);
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: err.message });
-  }
-});
+// // =======================
+// // VER BATERIAS
+// // =======================
+// app.get("/datos", async (req, res) => {
+//   try {
+//     const [result] = await db.query("SELECT * FROM monitoreo_baterias");
+//     res.json(result);
+//   } catch (err) {
+//     console.error(err);
+//     res.status(500).json({ error: err.message });
+//   }
+// });
 
 // Puerto
 const PORT = process.env.PORT || 5000;
