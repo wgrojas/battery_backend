@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 
 
 # dependencies
@@ -18,3 +19,8 @@
 .env.test.local
 .env.production.local
 
+=======
+node_modules
+.env
+.env.local
+>>>>>>> 5fa78c6 (Proyecto inicial limpio, sin secretos)
