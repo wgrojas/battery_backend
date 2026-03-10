@@ -1,56 +1,28 @@
-const express = require("express")
-const cors = require("cors")
-const axios = require("axios")
+require("dotenv").config();
+const express = require("express");
+const cors = require("cors");
 
-const app = express()
+const voltajeRoutes = require("./routes/voltajeRoutes");
+const usuarioRoutes = require("./routes/usuarioRoutes"); // <-- rutas de login/registro
 
-app.use(cors())
-app.use(express.json())
+const app = express();
 
-const PORT = 5000
+// Middlewares
+app.use(cors());
+app.use(express.json());
+
+// Rutas
+app.use("/api", voltajeRoutes);          // Rutas de voltaje/baterías
+app.use("/api/usuarios", usuarioRoutes); // Rutas de login y registro
 
 // Ruta principal
-app.get("/", (req,res)=>{
+app.get("/", (req, res) => {
+  res.send("🔋 API Monitor Solar funcionando");
+});
 
-res.send("API Monitor Solar funcionando")
-
-})
-
-
-// Ruta para recibir voltaje del ESP32
-app.post("/api/voltaje", async (req,res)=>{
-
-try{
-
-const voltaje = req.body.voltaje
-
-console.log("Voltaje recibido:", voltaje)
-
-// Ejemplo de uso de Axios (simulación de enviar alerta)
-const respuesta = await axios.get("https://api.coindesk.com/v1/bpi/currentprice.json")
-
-console.log("Consulta externa realizada")
-
-res.json({
-mensaje:"Voltaje recibido correctamente",
-voltaje:voltaje
-})
-
-}catch(error){
-
-console.log(error)
-
-res.status(500).json({
-error:"Error en la API"
-})
-
-}
-
-})
-
-
-app.listen(PORT,()=>{
-
-console.log("Servidor corriendo en puerto "+PORT)
-
-})
+//base datos 
+// Puerto
+const PORT = process.env.PORT || 5000;
+app.listen(PORT, () => {
+  console.log("Servidor corriendo en puerto " + PORT);
+});
