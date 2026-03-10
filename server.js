@@ -19,7 +19,7 @@ app.use("/api/usuarios", usuarioRoutes);
 
 // Ruta principal
 app.get("/", (req, res) => {
-  res.send("🔋 API Monitor Solar funcionando");
+  res.send("🔋 API Monitor Bateria Solar funcionando");
 });
 
 // =======================
@@ -62,5 +62,5 @@ app.get("/baterias", (req, res) => {
 const PORT = process.env.PORT || 5000;
 
 app.listen(PORT, () => {
-  console.log(" Bateria Servidor corriendo en puerto " + PORT);
+  console.log(" Servidor corriendo en puerto " + PORT);
 });
