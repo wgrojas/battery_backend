@@ -1,41 +1,31 @@
-const mysql = require("mysql2");
-const { URL } = require("url");
+const mysql = require("mysql2/promise");
+require("dotenv").config();
 
-// Cargar dotenv solo en local
-if (process.env.NODE_ENV !== "production") {
-  require("dotenv").config();
-}
+// Parsear DATABASE_URL de PlanetScale
+const url = new URL(process.env.DATABASE_URL);
 
-const databaseUrl = process.env.DATABASE_URL;
-
-if (!databaseUrl) {
-  console.error("❌ DATABASE_URL no definida");
-  throw new Error("DATABASE_URL no definida");
-}
-
-const dbUrl = new URL(databaseUrl);
-
-const pool = mysql.createPool({
-  host: dbUrl.hostname,
-  user: dbUrl.username,
-  password: dbUrl.password,
-  database: dbUrl.pathname.replace("/", ""),
-  port: dbUrl.port || 3306,
-  ssl: { rejectUnauthorized: true }, // obligatorio PlanetScale
+const db = mysql.createPool({
+  host: url.hostname,
+  user: url.username,
+  password: url.password,
+  database: url.pathname.replace("/", ""),
+  port: url.port || 3306,
   waitForConnections: true,
-  connectionLimit: 10,
-  queueLimit: 0
+  connectionLimit: 5,
+  queueLimit: 0,
+  ssl: { rejectUnauthorized: true },
+  connectTimeout: 20000,
 });
 
-const db = pool.promise();
-
-db.getConnection()
-  .then(conn => {
-    console.log("✅ MySQL conectado (Pool)");
-    conn.release();
-  })
-  .catch(err => {
-    console.error("❌ Error conectando a MySQL:", err);
-  });
+// Verificar conexión
+(async () => {
+  try {
+    const connection = await db.getConnection();
+    console.log("✅ Conectado a PlanetScale correctamente");
+    connection.release();
+  } catch (err) {
+    console.error("❌ Error conectando a PlanetScale:", err);
+  }
+})();
 
 module.exports = db;

@@ -1,4 +1,4 @@
-const db = require("../config/db");
+const db = require("../config/db"); // debe ser pool de promesas
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 
@@ -8,30 +8,22 @@ const jwt = require("jsonwebtoken");
 (async () => {
   try {
     const adminNombre = "admin";
-    const adminContraseña = "12345";
+    const adminPassword = "12345"; // cambiado de contraseña a password
 
     // Revisar si el usuario admin ya existe
-    db.query("SELECT * FROM usuarios WHERE nombre = ?", [adminNombre], async (err, results) => {
-      if (err) {
-        console.log("❌ Error al verificar usuario admin:", err);
-        return;
-      }
+    const [results] = await db.query("SELECT * FROM usuarios WHERE nombre = ?", [adminNombre]);
 
-      if (results.length === 0) {
-        // No existe, crearlo con bcrypt
-        const hashedPassword = await bcrypt.hash(adminContraseña, 10);
-        db.query(
-          "INSERT INTO usuarios (nombre, contraseña) VALUES (?, ?)",
-          [adminNombre, hashedPassword],
-          (err) => {
-            if (err) console.log("❌ Error al crear usuario admin:", err);
-            else console.log("✅ Usuario admin creado automáticamente con contraseña 12345");
-          }
-        );
-      } else {
-        console.log("ℹ️ Usuario admin ya existe, no se crea nuevamente");
-      }
-    });
+    if (results.length === 0) {
+      // No existe, crearlo con bcrypt
+      const hashedPassword = await bcrypt.hash(adminPassword, 10);
+      await db.query(
+        "INSERT INTO usuarios (nombre, password) VALUES (?, ?)", // columna cambiada a password
+        [adminNombre, hashedPassword]
+      );
+      console.log("✅ Usuario admin creado automáticamente con password 12345");
+    } else {
+      console.log("ℹ️ Usuario admin ya existe, no se crea nuevamente");
+    }
   } catch (err) {
     console.log("❌ Error al crear usuario admin:", err);
   }
@@ -41,36 +33,40 @@ const jwt = require("jsonwebtoken");
 // Registrar usuario
 // ==============================
 exports.registerUser = async (req, res) => {
-  const { nombre, contraseña } = req.body;
-  if (!nombre || !contraseña) return res.status(400).json({ error: "Faltan datos" });
+  const { nombre, password } = req.body; // cambiado a password
+  if (!nombre || !password)
+    return res.status(400).json({ error: "Faltan datos" });
 
   try {
-    const hashedPassword = await bcrypt.hash(contraseña, 10);
-    const sql = "INSERT INTO usuarios (nombre, contraseña) VALUES (?, ?)";
-    db.query(sql, [nombre, hashedPassword], (err, result) => {
-      if (err) return res.status(500).json({ error: "Error al registrar usuario" });
-      res.json({ success: true, mensaje: "Usuario registrado correctamente" });
-    });
+    const hashedPassword = await bcrypt.hash(password, 10);
+    const sql = "INSERT INTO usuarios (nombre, password) VALUES (?, ?)"; // columna cambiada a password
+    await db.query(sql, [nombre, hashedPassword]);
+    res.json({ success: true, mensaje: "Usuario registrado correctamente" });
   } catch (err) {
-    res.status(500).json({ error: "Error en el servidor" });
+    console.error("❌ Error al registrar usuario:", err);
+    res.status(500).json({ error: "Error al registrar usuario" });
   }
 };
 
 // ==============================
 // Login usuario
 // ==============================
-exports.loginUser = (req, res) => {
-  const { nombre, contraseña } = req.body;
-  if (!nombre || !contraseña) return res.status(400).json({ error: "Faltan datos" });
+exports.loginUser = async (req, res) => {
+  const { nombre, password } = req.body; // cambiado a password
+  if (!nombre || !password)
+    return res.status(400).json({ error: "Faltan datos" });
 
-  const sql = "SELECT * FROM usuarios WHERE nombre = ?";
-  db.query(sql, [nombre], async (err, results) => {
-    if (err) return res.status(500).json({ error: "Error en la base de datos" });
-    if (results.length === 0) return res.status(401).json({ error: "Usuario no encontrado" });
+  try {
+    const sql = "SELECT * FROM usuarios WHERE nombre = ?";
+    const [results] = await db.query(sql, [nombre]);
+
+    if (results.length === 0)
+      return res.status(401).json({ error: "Usuario no encontrado" });
 
     const user = results[0];
-    const match = await bcrypt.compare(contraseña, user.contraseña);
-    if (!match) return res.status(401).json({ error: "Contraseña incorrecta" });
+    const match = await bcrypt.compare(password, user.password); // columna cambiada a password
+    if (!match)
+      return res.status(401).json({ error: "Password incorrecta" });
 
     const token = jwt.sign(
       { id: user.id, nombre: user.nombre },
@@ -79,5 +75,8 @@ exports.loginUser = (req, res) => {
     );
 
     res.json({ success: true, mensaje: "Login exitoso", token });
-  });
+  } catch (err) {
+    console.error("❌ Error en login:", err);
+    res.status(500).json({ error: "Error en el servidor" });
+  }
 };

@@ -2,7 +2,7 @@ require("dotenv").config();
 const express = require("express");
 const cors = require("cors");
 
-const db = require("./config/db"); // pool de promesas
+const db = require("./config/db"); // pool clásico (callbacks)
 
 const voltajeRoutes = require("./routes/voltajeRoutes");
 const usuarioRoutes = require("./routes/usuarioRoutes");
@@ -25,27 +25,27 @@ app.get("/", (req, res) => {
 // =======================
 // VER USUARIOS
 // =======================
-app.get("/usuarios", async (req, res) => {
-  try {
-    const [result] = await db.query("SELECT * FROM usuarios");
-    res.json(result);
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: err.message });
-  }
+app.get("/usuarios", (req, res) => {
+  db.query("SELECT * FROM usuarios", (err, results) => {
+    if (err) {
+      console.error(err);
+      return res.status(500).json({ error: err.message });
+    }
+    res.json(results);
+  });
 });
 
 // =======================
 // VER BATERIAS
 // =======================
-app.get("/datos", async (req, res) => {
-  try {
-    const [result] = await db.query("SELECT * FROM monitoreo_baterias");
-    res.json(result);
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: err.message });
-  }
+app.get("/datos", (req, res) => {
+  db.query("SELECT * FROM monitoreo_baterias", (err, results) => {
+    if (err) {
+      console.error(err);
+      return res.status(500).json({ error: err.message });
+    }
+    res.json(results);
+  });
 });
 
 // Puerto
