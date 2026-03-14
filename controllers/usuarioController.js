@@ -15,72 +15,118 @@ const generateToken = (user) => {
 // REGISTRAR USUARIO
 // ==============================
 exports.registerUser = async (req, res) => {
-  const { nombre, password } = req.body; // cambiado de contraseña a password
+  const { nombre, password } = req.body;
 
   if (!nombre || !password) {
     return res.status(400).json({ success: false, error: "Faltan datos" });
   }
 
   try {
-    // Verificar si el usuario ya existe
-    const [results] = await db.query("SELECT * FROM usuarios WHERE nombre = ?", [nombre]);
+
+    const [results] = await db.query(
+      "SELECT * FROM usuarios WHERE nombre = ?",
+      [nombre]
+    );
+
     if (results.length > 0) {
-      return res.status(400).json({ success: false, error: "Usuario repetido" });
+      return res.status(400).json({
+        success: false,
+        error: "Usuario repetido"
+      });
     }
 
-    // Hashear password
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    // Insertar usuario
     await db.query(
       "INSERT INTO usuarios (nombre, password) VALUES (?, ?)",
       [nombre, hashedPassword]
     );
 
-    res.json({ success: true, mensaje: "Usuario registrado correctamente" });
+    res.json({
+      success: true,
+      mensaje: "Usuario registrado correctamente"
+    });
+
   } catch (err) {
+
     console.error("❌ Error al registrar usuario:", err);
-    res.status(500).json({ success: false, error: "Error en la base de datos" });
+
+    res.status(500).json({
+      success: false,
+      error: "Error de conexión a la base de datos"
+    });
+
   }
 };
+
 
 // ==============================
 // LOGIN USUARIO
 // ==============================
 exports.loginUser = async (req, res) => {
-  const { nombre, password } = req.body; // cambiado de contraseña a password
+
+  const { nombre, password } = req.body;
 
   if (!nombre || !password) {
-    return res.status(400).json({ success: false, error: "Faltan datos" });
+    return res.status(400).json({
+      success: false,
+      error: "Faltan datos"
+    });
   }
 
   try {
-    // Buscar usuario
-    const [results] = await db.query("SELECT * FROM usuarios WHERE nombre = ?", [nombre]);
+
+    const [results] = await db.query(
+      "SELECT * FROM usuarios WHERE nombre = ?",
+      [nombre]
+    );
+
+    // ❌ Usuario no existe
     if (results.length === 0) {
-      return res.status(401).json({ success: false, error: "Usuario no encontrado" });
+      return res.status(401).json({
+        success: false,
+        error: "Usuario o contraseña incorrectos"
+      });
     }
 
     const user = results[0];
 
-    // Validar que exista hash de password
+    // ❌ Usuario sin password
     if (!user.password) {
-      return res.status(500).json({ success: false, error: "Usuario sin password válida" });
+      return res.status(500).json({
+        success: false,
+        error: "Error en la base de datos"
+      });
     }
 
-    // Verificar password
     const match = await bcrypt.compare(password, user.password);
+
+    // ❌ Password incorrecta
     if (!match) {
-      return res.status(401).json({ success: false, error: "Password incorrecta" });
+      return res.status(401).json({
+        success: false,
+        error: "Usuario o contraseña incorrectos"
+      });
     }
 
-    // Generar token
+    // ✅ Login correcto
     const token = generateToken(user);
 
-    // Enviar token y nombre de usuario al frontend
-    res.json({ success: true, mensaje: "Login exitoso", token, usuario: user.nombre });
+    res.json({
+      success: true,
+      mensaje: "Login exitoso",
+      token,
+      usuario: user.nombre
+    });
+
   } catch (err) {
+
     console.error("❌ Error en login:", err);
-    res.status(500).json({ success: false, error: "Error en la base de datos" });
+
+    res.status(500).json({
+      success: false,
+      error: "Error de conexión a la base de datos"
+    });
+
   }
 };
