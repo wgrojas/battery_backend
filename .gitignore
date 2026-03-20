@@ -1,0 +1,26 @@
+<<<<<<< HEAD
+
+
+# dependencies
+/node_modules
+/.pnp
+.pnp.js
+
+# testing
+/coverage
+
+# production
+/build
+
+# misc
+.DS_Store
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+=======
+node_modules
+.env
+.env.local
+>>>>>>> 5fa78c6 (Proyecto inicial limpio, sin secretos)
