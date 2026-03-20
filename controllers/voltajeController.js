@@ -67,68 +67,98 @@ exports.recibirVoltaje = async (req, res) => {
   }
 };
 
-// ==============================
-// OBTENER DATOS
-// ==============================
-// exports.obtenerDatos = async (req, res) => {
-//   try {
-//     const [result] = await db.query(
-//       "SELECT * FROM monitoreo_baterias ORDER BY fecha DESC LIMIT 30"
-//     );
+==============================
+OBTENER TOODS LOS DATOS
+==============================
+exports.obtenerDatos = async (req, res) => {
+  try {
+    const [result] = await db.query(
+      "SELECT * FROM monitoreo_baterias ORDER BY fecha DESC LIMIT 30"
+    );
 
-//     console.log("📊 Consultando últimos 30 datos...");
+    console.log("📊 Consultando últimos 30 datos...");
 
-//     // return res.json({
-//     //   status: "OK",
-//     //   mensaje: "✅ API activa",
-//     //   total: result.length,
-//     //   datos: result
-//     // });
+    // return res.json({
+    //   status: "OK",
+    //   mensaje: "✅ API activa",
+    //   total: result.length,
+    //   datos: result
+    // });
 
-//   res.json(result);
+  res.json(result);
 
-//   } catch (err) {
-//     console.error("❌ Error consultando datos:", err);
-//    res.status(500).json({ error: "Error consultando datos" });
-//   }
-// };
+  } catch (err) {
+    console.error("❌ Error consultando datos:", err);
+   res.status(500).json({ error: "Error consultando datos" });
+  }
+};
 
 
 // ==============================
 // OBTENER DATOS FILTRADOS (cada 5 minutos)
 // ==============================
-exports.obtenerDatos = async (req, res) => {
-  try {
-    // Tomar solo los últimos 100 datos
-    const [result] = await db.query(
-      "SELECT * FROM monitoreo_baterias ORDER BY fecha DESC LIMIT 30"
-    );
+// exports.obtenerDatos = async (req, res) => {
+//   try {
+//     // Tomar solo los últimos 100 datos
+//     const [result] = await db.query(
+//       "SELECT * FROM monitoreo_baterias ORDER BY fecha DESC LIMIT 30"
+//     );
 
-    // Filtrar para mostrar 1 dato cada 5 minutos (300000 ms)
-    const filtrados = [];
-    let lastTime = 0;
+//     // Filtrar para mostrar 1 dato cada 5 minutos (300000 ms)
+//     const filtrados = [];
+//     let lastTime = 0;
 
-    result.reverse().forEach((dato) => { // reversa para procesar cronológicamente
-      const tiempoDato = new Date(dato.fecha).getTime();
-      if (tiempoDato - lastTime >= 300000 || lastTime === 0) { // 5 min
-        filtrados.push(dato);
-        lastTime = tiempoDato;
-      }
-    });
+//     result.reverse().forEach((dato) => { // reversa para procesar cronológicamente
+//       const tiempoDato = new Date(dato.fecha).getTime();
+//       if (tiempoDato - lastTime >= 300000 || lastTime === 0) { // 5 min
+//         filtrados.push(dato);
+//         lastTime = tiempoDato;
+//       }
+//     });
 
-    // res.json({
-    //   mensaje: "Datos filtrados cada 5 minutos",
-    //   cantidadTotal: result.length,
-    //   cantidadMostrada: filtrados.length,
-    //   datos: filtrados.reverse(), // invertimos para mostrar del más reciente al más viejo
-    // });
+//     // res.json({
+//     //   mensaje: "Datos filtrados cada 5 minutos",
+//     //   cantidadTotal: result.length,
+//     //   cantidadMostrada: filtrados.length,
+//     //   datos: filtrados.reverse(), // invertimos para mostrar del más reciente al más viejo
+//     // });
 
-    res.json(filtrados.reverse())
-  } catch (err) {
-    console.error("❌ Error consultando datos:", err);
-    res.status(500).json({ error: "Error consultando datos" });
-  }
-};
+//     res.json(filtrados.reverse())
+//   } catch (err) {
+//     console.error("❌ Error consultando datos:", err);
+//     res.status(500).json({ error: "Error consultando datos" });
+//   }
+// };
+
+
+// // ==============================
+// // OBTENER DATOS FILTRADOS (cada 1 minuto)
+// // ==============================
+// exports.obtenerDatos = async (req, res) => {
+//   try {
+//     const [result] = await db.query(
+//       "SELECT * FROM monitoreo_baterias ORDER BY fecha DESC LIMIT 500"
+//     );
+
+//     const filtrados = [];
+//     let lastTime = 0;
+
+//     result.reverse().forEach((dato) => {
+//       const tiempoDato = new Date(dato.fecha).getTime();
+
+//       if (lastTime === 0 || tiempoDato - lastTime >= 60000) { // 🔥 1 min para pruebas
+//         filtrados.push(dato);
+//         lastTime = tiempoDato;
+//       }
+//     });
+
+//     res.json(filtrados.reverse());
+
+//   } catch (err) {
+//     console.error("❌ Error consultando datos:", err);
+//     res.status(500).json({ error: "Error consultando datos" });
+//   }
+// };
 // ==============================
 // BORRAR TODOS LOS DATOS
 // ==============================
