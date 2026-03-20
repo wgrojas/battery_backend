@@ -134,21 +134,19 @@ exports.obtenerDatos = async (req, res) => {
 // ==============================
 exports.borrarDatos = async (req, res) => {
   try {
-    const [result] = await db.query("DELETE FROM monitoreo_baterias");
+    await db.query("TRUNCATE TABLE monitoreo_baterias");
 
-    console.log(`🗑️ Se eliminaron ${result.affectedRows} registros`);
+    console.log("♻️ Tabla reiniciada completamente");
 
     return res.json({
-      mensaje: "Datos eliminados correctamente",
-      registrosEliminados: result.affectedRows,
+      mensaje: "Datos eliminados y ID reiniciado"
     });
 
   } catch (err) {
-    console.error("❌ Error eliminando datos:", err);
+    console.error("❌ Error:", err);
     return res.status(500).json({ error: "Error eliminando datos" });
   }
 };
-
 // ==============================
 // BORRAR DATO POR ID
 // ==============================

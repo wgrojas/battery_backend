@@ -21,7 +21,8 @@ async function insertarDatos() {
 
   try {
     for (const dato of datos) {
-      const res = await axios.post("http://localhost:5000/api/voltaje", dato);
+    //   const res = await axios.post("http://localhost:5000/api/voltaje", dato);
+      const res = await axios.post("https://battery-monitor-93742821e808.herokuapp.com/api/voltaje", dato);
      
       console.log("Insertado:", res.data);
     }
