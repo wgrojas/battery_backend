@@ -67,9 +67,9 @@ exports.recibirVoltaje = async (req, res) => {
   }
 };
 
-==============================
-OBTENER TOODS LOS DATOS
-==============================
+//==============================
+//OBTENER TOODS LOS DATOS
+//==============================
 exports.obtenerDatos = async (req, res) => {
   try {
     const [result] = await db.query(
