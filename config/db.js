@@ -30,6 +30,9 @@ const db = mysql.createPool({
 
 module.exports = db;
 
+// ////////////////////////
+// //BASE DE DATOS LOCAL
+// /////////////////////////
 // const mysql = require("mysql2/promise");
 // require("dotenv").config();
 
